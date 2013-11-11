@@ -1,0 +1,50 @@
+create soma
+access soma
+
+insert pas
+insert Golgi_KA
+
+celsius = 23
+
+psection()
+
+objref g
+g = new Graph(0)
+
+minV = -120
+maxV = 120
+
+g.size(minV,maxV,0,1)
+
+g.view(minV, 0, (maxV - minV), 1.0, 80, 330, 330, 250)
+
+g.addexpr("alp_a_Golgi_KA(v)", 1, 1)
+g.addexpr("bet_a_Golgi_KA(v)", 2, 1)
+g.addexpr("alp_b_Golgi_KA(v)", 3, 1)
+g.addexpr("bet_b_Golgi_KA(v)", 4, 1)
+
+g.begin()
+
+for (v=minV; v<=maxV; v=v+1) {
+    g.plot(v)
+}
+
+
+/*
+g.beginline()		//The next g.line command will move the drawing pen
+
+for (v=-100; v<=100; v=v+1) {
+
+    alp_a = alp_a_Golgi_KA(v)
+    bet_a = bet_a_Golgi_KA(v)
+
+    print "At voltage: ", v, " alp_a: ", alp_a
+
+	g.line(v, alp_a)	//States that the y values on the plot
+
+
+}*/
+
+g.flush()	//Actually draws the plot on the graph in the window.
+
+print "Done!"

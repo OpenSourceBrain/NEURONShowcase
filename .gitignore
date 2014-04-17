@@ -4,3 +4,4 @@ umac
 *.dll
 *.o
 *.c
+HHChannelAnalyser/*.dat

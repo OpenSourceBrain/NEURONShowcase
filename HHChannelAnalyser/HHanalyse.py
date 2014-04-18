@@ -49,6 +49,12 @@ def process_args():
                         default=10,
                         help='Voltage step to use (integer)')
                         
+    parser.add_argument('-dt', 
+                        type=float,
+                        metavar='<time step>',
+                        default=0.01,
+                        help='Timestep for simulations, dt')
+                        
     parser.add_argument('-modFile', 
                         type=str,
                         metavar='<name of mod file>',
@@ -159,7 +165,7 @@ def main():
         tstopMax = preHold + postHoldMax
 
         h('tstop = '+str(tstopMax))
-        h.dt = 0.25
+        h.dt = args.dt
         '''
         clampobj = h.VClamp(.5)
         clampobj.dur[0]=preHold

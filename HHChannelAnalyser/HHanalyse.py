@@ -14,6 +14,7 @@ print("\n\n")
 
 import matplotlib.pyplot as plt
 from pylab import *
+from math import log
 
 
 def process_args():
@@ -34,26 +35,32 @@ def process_args():
                         type=int,
                         metavar='<min v>',
                         default=-100,
-                        help='Minimum voltage to test (integer)')
+                        help='Minimum voltage to test (integer, mV)')
                         
     parser.add_argument('-maxV', 
                         type=int,
                         metavar='<max v>',
                         default=100,
-                        help='Maximum voltage to test (integer)')
+                        help='Maximum voltage to test (integer, mV)')
                         
                         
     parser.add_argument('-stepV', 
                         type=int,
                         metavar='<step v>',
                         default=10,
-                        help='Voltage step to use (integer)')
+                        help='Voltage step to use (integer, mV)')
                         
     parser.add_argument('-dt', 
                         type=float,
                         metavar='<time step>',
                         default=0.01,
-                        help='Timestep for simulations, dt')
+                        help='Timestep for simulations, dt, in ms') #OR -1 for variable time step')
+                        
+    parser.add_argument('-temperature', 
+                        type=float,
+                        metavar='<temperature>',
+                        default=6.3,
+                        help='Temperature (float, celsius)')
                         
     parser.add_argument('-modFile', 
                         type=str,
@@ -62,6 +69,17 @@ def process_args():
 
     
     return parser.parse_args()
+
+def get_state_color(s):
+    col='#000000'
+    if s=='m': col='#FF0000'
+    if s=='h': col='#00FF00'
+    if s=='n': col='#0000FF'
+    if s=='a': col='#FF0000'
+    if s=='b': col='#00FF00'
+    if s=='c': col='#0000FF'
+    
+    return col
 
 def main():
 
@@ -85,6 +103,8 @@ def main():
     ''')
 
 
+    h.celsius = args.temperature
+        
     ## Create a section, set size & insert pas, passive channel mechanism
 
     sec = h.Section()
@@ -134,13 +154,14 @@ def main():
     minV = args.minV
     maxV = args.maxV
     interval = args.stepV
-    volts = range(minV,maxV,interval)
+    volts = range(minV,maxV+interval,interval)
 
     v0 = -0.5                           # Pre holding potential
-    preHold = 150                       # and duration
+    preHold = 50                       # and duration
     postHoldStep = 10                  # Post step holding time between steady state checks
     postHoldMax = postHoldStep * 1000   # Max sim run time
-
+    
+    timeToCheckTau = preHold + (10*h.dt)
 
 
     steadyStateVals = {}
@@ -154,9 +175,11 @@ def main():
 
     if verbose: 
         figV = plt.figure()
+        figV.suptitle("Membrane potentials")
         plV = figV.add_subplot(111, autoscale_on=True)
 
         figR = plt.figure()
+        figR.suptitle("Rate variables at %s degC"%h.celsius)
         plR = figR.add_subplot(111, autoscale_on=True)
 
 
@@ -166,14 +189,11 @@ def main():
 
         h('tstop = '+str(tstopMax))
         h.dt = args.dt
-        '''
-        clampobj = h.VClamp(.5)
-        clampobj.dur[0]=preHold
-        clampobj.amp[0]=v0
-        clampobj.dur[1]=postHoldMax
-        clampobj.amp[1]=vh
-
-        '''
+        
+        if h.dt == -1:
+            h.cvode.active(1)
+            h.cvode.atol(0.0001)
+            
         # Alternatively use a SEClamp obj
         clampobj = h.SEClamp(.5)
         clampobj.dur1=preHold
@@ -181,7 +201,6 @@ def main():
         clampobj.dur2=postHoldMax
         clampobj.amp2=vh
         clampobj.rs=0.001
-
 
 
         tRec = []
@@ -193,75 +212,73 @@ def main():
         print "Starting a simulation of max time: %f, with holding potential: %f"%(tstopMax, vh)
         #h.cvode.active(1)
         h.finitialize(v0)
-        steady = False
-        tolerance = 0.01
-        checksPassed = 0
-        checksToPass = 3
+        tolerance = 1e-5
         lastCheckTime = -1
         lastCheckVal = {}
         initSlopeVal = {}
-        foundTau = {}
+        foundTau = []
+        foundInf = []
 
         for s in states:
             lastCheckVal[s]=-1e-9
             initSlopeVal[s]=1e9
-            foundTau[s]=False
 
 
-        while ( (checksPassed < checksToPass) and (h.t <= tstopMax) ) or not foundTau[s]:
+        while (h.t <= tstopMax) and (s not in foundInf or s not in foundTau):
 
             h.fadvance()
             tRec.append(h.t)
             vRec.append(sec(0.5).v)
-
+            if verbose: print "--- Time: %s; dt: %s; voltage %f; found Tau %s; found Inf %s"%(h.t, h.dt, vh, foundTau, foundInf)
             for s in states:
                 rateVal = eval("sec(0.5)."+s+"_"+chanToTest)
                 rateRec[s].append(float(rateVal))
-                if(h.t >= preHold):
-                    slope = (rateRec[s][-1] - rateRec[s][-2])/h.dt
-                    #print "Slope of %s: %f, init slope: %f; at val: %f and time: %f"%(s, slope, initSlopeVal[s], rateVal,  h.t)
-                    timeToCheck = preHold+ (10*h.dt)
+                
+                if s not in foundTau:
+                    if(h.t >= preHold):
+                        slope = (rateRec[s][-1] - rateRec[s][-2])/h.dt
+                        fractOfInit = slope/initSlopeVal[s]
+                        if verbose: print "        Slope of %s: %s (%s -> %s); init slope: %s; fractOfInit: %s; rateVal: %s"%(s, slope, rateRec[s][-2], rateRec[s][-1], initSlopeVal[s], fractOfInit, rateVal)
+                        
+                        if initSlopeVal[s]==1e9 and h.t >= timeToCheckTau:
+                            initSlopeVal[s] = slope
+                            if verbose: print "        Init slope of %s: %s at val: %s; timeToCheckTau: %s"%(s, slope, rateVal, timeToCheckTau)
+                        elif initSlopeVal[s]!=1e9:
 
-                    if initSlopeVal[s]==1e9 and h.t >= timeToCheck:
-                        initSlopeVal[s] = slope
-                        if verbose: print "Init slope of %s: %f at val: %f and time: %f"%(s, slope, rateVal,  h.t)
-                    elif initSlopeVal[s]!=1e9 and slope/initSlopeVal[s] < 0.367879441 and not foundTau[s]:
-                        foundTau[s] = True
-                        timeCourseVals[s].append(h.t-timeToCheck)
+                            if fractOfInit < 0.367879441:
+                                tau =  (h.t-timeToCheckTau)  #/ (-1*log(fractOfInit))
+                                if verbose: print "        Found! Slope %s: %s, init: %s; at val: %s; time diff %s; fractOfInit: %s; log %s; tau %s"%(s, slope, initSlopeVal[s], rateVal, h.t-timeToCheckTau, fractOfInit, log(fractOfInit), tau)
+                                foundTau.append(s)
+                                timeCourseVals[s].append(tau)
+                            else:
+                                if verbose: print "        Not yet fallen by 1/e: %s"% fractOfInit   
 
 
 
 
             if h.t >= preHold and h.t >= lastCheckTime+postHoldStep:
-                if verbose: print "Carrying out check at %f"%h.t
+                
                 lastCheckTime = h.t
-                allChecksPassed = True
 
                 for s in states:
                     val = eval("sec(0.5)."+s+"_"+chanToTest)
 
-                    if abs((lastCheckVal[s]-val)/val) > tolerance:
-                        allChecksPassed = allChecksPassed and False
-                        if verbose: print "State %s has failed at %f"%(s,val)
-                    else:
-                        if verbose: print "State %s has passed at %f"%(s,val)
+                    if s not in foundInf:
+                        if abs((lastCheckVal[s]-val)/val) > tolerance:
+                            if verbose: print "State %s has failed at %f; lastCheckVal[s] = %f; fract = %f; tolerance = %f"%(s,val, lastCheckVal[s], ((lastCheckVal[s]-val)/val), tolerance)
+                        else:
+                            if verbose: print "State %s has passed at %f"%(s,val)
+                            foundInf.append(s)
 
-                    lastCheckVal[s] = val
-
-                if allChecksPassed:
-                    if verbose: print "One more check passed..."
-                    checksPassed = checksPassed +1
+                        lastCheckVal[s] = val
 
 
-        if verbose: print "Finished run,  t: %f, v: %f, vh: %f, checksPassed: %i, initSlopeVal: %s, timeCourseVals: %s ---  "%(h.t, sec(0.5).v, vh, checksPassed, str(initSlopeVal), str(timeCourseVals))
+        if verbose: print "Finished run,  t: %f, v: %f, vh: %f, initSlopeVal: %s, timeCourseVals: %s ---  "%(h.t, sec(0.5).v, vh, str(initSlopeVal), str(timeCourseVals))
 
         if verbose: plV.plot(tRec, vRec, solid_joinstyle ='round', solid_capstyle ='round', color='#000000', linestyle='-', marker='None')
 
         for s in states:
-            col='#000000'
-            if s=='m': col='#FF0000'
-            if s=='h': col='#00FF00'
-            if s=='n': col='#0000FF'
+            col=get_state_color(s)
             if verbose: plR.plot(tRec, rateRec[s], solid_joinstyle ='round', solid_capstyle ='round', color=col, linestyle='-', marker='None')
 
         for s in states:
@@ -269,23 +286,18 @@ def main():
             steadyStateVals[s].append(val)
 
 
-    if verbose: print "steadyStateVals"+str(steadyStateVals)
-    if verbose: print "timeCourseVals"+str(timeCourseVals)
-
-
 
     figRates = plt.figure()
+    figRates.suptitle("Steady states of rate activation variables")
     plRates = figRates.add_subplot(111, autoscale_on=False, xlim=(minV - 0.1*(maxV-minV), maxV + 0.1*(maxV-minV)), ylim=(-0.1, 1.1))
 
 
     figTau = plt.figure()
+    figTau.suptitle("Time courses of rate activation variables at %s degC"%h.celsius)
     plTau = figTau.add_subplot(111, autoscale_on=True)
 
     for s in states:
-        col='#000000'
-        if s=='m': col='#FF0000'
-        if s=='h': col='#00FF00'
-        if s=='n': col='#0000FF'
+        col=get_state_color(s)
 
         plRates.plot(volts, steadyStateVals[s], label='Steady state of %s in %s'%(s,chanToTest), solid_joinstyle ='round', solid_capstyle ='round', color=col, linestyle='-', marker='o')
 

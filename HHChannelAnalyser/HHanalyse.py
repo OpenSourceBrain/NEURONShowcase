@@ -31,6 +31,11 @@ def process_args():
                         default=False,
                         help="Verbose output")
                         
+    parser.add_argument('-nogui',
+                        action='store_true',
+                        default=False,
+                        help="Supress plotting of variables and only save to file")
+                        
     parser.add_argument('-minV', 
                         type=int,
                         metavar='<min v>',
@@ -209,7 +214,7 @@ def main():
         for s in states:
             rateRec[s] = []
 
-        print "Starting a simulation of max time: %f, with holding potential: %f"%(tstopMax, vh)
+        print "Starting simulation with channel %s of max time: %f, with holding potential: %f"%(chanToTest, tstopMax, vh)
         #h.cvode.active(1)
         h.finitialize(v0)
         tolerance = 1e-5
@@ -308,8 +313,6 @@ def main():
 
         plTau.legend(loc='center right')
 
-    plt.show()
-
 
     for s in states:
         file_name = "%s.%s.inf.dat"%(chanToTest, s)
@@ -325,6 +328,10 @@ def main():
             file.write("%f\t%f\n"%(volts[i], timeCourseVals[s][i]))
         file.close()
         print("Written info to file: %s"%file_name)
+        
+        
+    if not args.nogui:
+        plt.show()
 
     print "Done!"
 

@@ -1,6 +1,7 @@
 NEURON Showcase
 ===============
+[![Continuous build using OMV](https://github.com/OpenSourceBrain/NEURONShowcase/actions/workflows/omv-ci.yml/badge.svg)](https://github.com/OpenSourceBrain/NEURONShowcase/actions/workflows/omv-ci.yml)
 
-Examples of how to convert NEURON to &amp; from NeuroML
+Examples of how to convert NEURON to and from NeuroML. 
 
-See http://www.opensourcebrain.org/projects/neuronshowcase/wiki for more details.
+See https://docs.neuroml.org/Userdocs/Software/Tools/NEURON.html for more details.

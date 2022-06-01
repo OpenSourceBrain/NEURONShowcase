@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<neuroml xmlns="http://www.neuroml.org/schema/neuroml2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2beta4.xsd" id="Kv3_1">
+
+    <notes>NeuroML file containing a single Channel description</notes>
+
+    <ionChannel id="test6" conductance="10pS" type="fooChannel" species="k" gbar="1.0 S_per_cm2" ek="-70 mV" mgi="0.001 mM">
+    </ionChannel>
+
+
+    <ComponentType name="fooChannel"
+                   extends="baseIonChannel"
+                   description="based on a model modified from Moczydlowski and Latorre (1983)">
+        <!-- IS THIS A HEADER COMMENT? -->
+
+        <Parameter name="gbar" dimension="conductanceDensity" />
+        <Parameter name="ek" dimension="voltage" />
+        <Parameter name="mgi" dimension="concentration"/>  <!-- what's the right way to do mgi -->
+        <Constant name="tau" dimension="time" value="6.28 ms"/>
+        <Exposure name="m" dimension="none"/>
+        <Exposure name="m_inf" dimension="none"/>
+        <Exposure name="tau_m" dimension="time"/>
+
+        <Dynamics>
+            <StateVariable name="m" exposure="m" dimension="none" />
+            <TimeDerivative variable="m" value="(m - 1) / 2"/>
+            <DerivedVariable name="double_m" value="2 * m"/>
+            <DerivedVariable name="fopen" value="(1 + mgi) / double_m" />
+
+            <OnStart>
+                <StateAssignment variable="m" value="7" />
+            </OnStart>            
+        </Dynamics>
+
+
+    </ComponentType>
+
+</neuroml>

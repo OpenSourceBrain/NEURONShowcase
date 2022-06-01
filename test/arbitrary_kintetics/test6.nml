@@ -8,9 +8,13 @@
 
 
     <ComponentType name="fooChannel"
-                   extends="baseIonChannel"
+                   extends="ionChannel"
                    description="based on a model modified from Moczydlowski and Latorre (1983)">
         <!-- IS THIS A HEADER COMMENT? -->
+
+
+        <!-- TODO: Ensure Text elements are inherited from base type -->
+        <Text name="species"/>
 
         <Parameter name="gbar" dimension="conductanceDensity" />
         <Parameter name="ek" dimension="voltage" />
@@ -28,7 +32,7 @@
 
             <OnStart>
                 <StateAssignment variable="m" value="7" />
-            </OnStart>            
+            </OnStart>
         </Dynamics>
 
 

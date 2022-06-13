@@ -1,9 +1,6 @@
 HHChannelAnalyser
 -----------------
 
-A simple utility for generating plots of activation variables from NEURON mod files.
+**Note: this functionalist has been moved to pyNeuroML!**
 
-To test this, install NEURON and try:
-
-    nrniv
-    python HHanalyse.py NaConductance
+See https://docs.neuroml.org/Userdocs/VisualisingChannels.html#use-pynml-channelanalysis-in-pyneuroml for more details. 

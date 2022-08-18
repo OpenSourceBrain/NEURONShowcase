@@ -23,22 +23,22 @@ proc morph() {
 
     for i=0,n3d()-1{
 
-		delx = x3d(i)-lastx
-		dely = y3d(i)-lasty
-		delz = z3d(i)-lastz
-		len = sqrt((delx*delx)+(dely*dely)+(delz*delz))
+    delx = x3d(i)-lastx
+    dely = y3d(i)-lasty
+    delz = z3d(i)-lastz
+    len = sqrt((delx*delx)+(dely*dely)+(delz*delz))
 
-		if (i==0){
-			delx = dely = delz = len = 0
-		}
+    if (i==0){
+      delx = dely = delz = len = 0
+    }
 
-		 print "+ ", secname(), " ", i, ": (", x3d(i), ", ", y3d(i), ", ", z3d(i),") diam: ", diam3d(i), "  del: (", delx,", ", dely,", ", delz,")  len: ", len
+     print "+ ", secname(), " ", i, ": (", x3d(i), ", ", y3d(i), ", ", z3d(i),") diam: ", diam3d(i), "  del: (", delx,", ", dely,", ", delz,")  len: ", len
 
-		lastx = x3d(i)
-		lasty = y3d(i)
-		lastz = z3d(i)
+    lastx = x3d(i)
+    lasty = y3d(i)
+    lastz = z3d(i)
 
-	}
+  }
 
     print "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
@@ -342,12 +342,12 @@ numTestsFailed = 0
 
 proc testEquals() {
 
-	if ($1 != $2) {
-		print "Test failed: ", $1, "  != ", $2
-		numTestsFailed = numTestsFailed + 1
-	} else {
-		numTestsPassed = numTestsPassed + 1
-	}
+  if ($1 != $2) {
+    print "Test failed: ", $1, "  != ", $2
+    numTestsFailed = numTestsFailed + 1
+  } else {
+    numTestsPassed = numTestsPassed + 1
+  }
 
 }
 

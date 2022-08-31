@@ -35,7 +35,7 @@ def merge_with_template(info):
         templ = airspeed.Template(f.read())
     return templ.merge(info)
 
-def generate_neuroml2_for_mod_file(mod_file):
+def generate_neuroml2_for_mod_file(mod_file, nmlfilepath):
     logger.info("Generating NeuroML2 representation for mod file: " + mod_file)
 
     blocks = {}
@@ -89,7 +89,7 @@ def generate_neuroml2_for_mod_file(mod_file):
         else:
             continue
     instance_count = {x.strip(" "):inst.count(x) for x in inst}
-    print(instance_count)
+
     gates = []
     for s in blocks["STATE"]:
         gate = {}
@@ -107,7 +107,7 @@ def generate_neuroml2_for_mod_file(mod_file):
 
     # pp.pprint(blocks)
 
-    chan_file_name = "%s.channel.nml" % info["id"]
+    chan_file_name = "{}/{}.channel.nml".format(nmlfilepath, info["id"])
     chan_file = open(chan_file_name, "w")
 
     for key, value in blocks.items():
@@ -128,7 +128,7 @@ def generate_neuroml2_for_mod_file(mod_file):
     chan_file.write(merge_with_template(info))
     chan_file.close()
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    mod_file = sys.argv[1]
-    generate_neuroml2_for_mod_file(mod_file)
+#     mod_file = sys.argv[1]
+#     generate_neuroml2_for_mod_file(mod_file)

@@ -34,9 +34,9 @@ jobs:
         pip install git+https://github.com/OpenSourceBrain/osb-model-validation
         pip install scipy sympy matplotlib cython pandas tables
 
-    - name: Install NEURON
+    - name: Install ${{ matrix.engine }}
       run: |
-        omv install pyneuron
+        omv install ${{ matrix.engine }}
                 
     - name: Test HHChannelAnalyser
       run: |

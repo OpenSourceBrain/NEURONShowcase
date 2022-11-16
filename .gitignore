@@ -5,3 +5,6 @@ umac
 *.o
 *.c
 HHChannelAnalyser/*.dat
+parsemod/mod_to_nml_test*.ipynb
+parsemod/test/*.nml
+

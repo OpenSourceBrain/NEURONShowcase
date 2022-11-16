@@ -20,6 +20,11 @@ jobs:
            - "PyNEURON:8.0.0"
            - "PyNEURON:8.1.0"
         runs-on: [ubuntu-latest, macos-11 ]
+        exclude:
+          - python-version: "3.10"
+            engine: "PyNEURON:7.8.2"
+          - python-version: "3.10"
+            engine: "PyNEURON:8.0.0"
 
     steps:
     - uses: actions/checkout@v2

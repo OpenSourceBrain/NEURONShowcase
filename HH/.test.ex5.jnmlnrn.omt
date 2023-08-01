@@ -8,7 +8,7 @@ experiments:
     observables:
       spike times:
         file: 
-          path: .ex5_v.dat
+          path: ex5_v.dat
           columns: [0,1]
           scaling: [1000, 1000]
         spike detection: 

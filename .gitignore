@@ -7,4 +7,6 @@ umac
 HHChannelAnalyser/*.dat
 parsemod/mod_to_nml_test*.ipynb
 parsemod/test/*.nml
-
+arm64
+/HH/*.dat
+/HH/report*.txt

@@ -50,6 +50,10 @@ jobs:
         nrnivmodl
         python HHanalyse.py NaConductance -nogui
 
+    - name: OMV run tests on all reusing NEURON from ${{ matrix.engine }}
+      run: |
+        omv all -V
+
     - name: OMV final version info
       run: |
         omv list -V # list installed engines

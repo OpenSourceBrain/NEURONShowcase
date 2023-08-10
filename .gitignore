@@ -10,3 +10,6 @@ parsemod/test/*.nml
 arm64
 /HH/*.dat
 /HH/report*.txt
+/HH/*_nrn.py
+/HH/*.hoc
+/HH/*.mod

@@ -13,3 +13,5 @@ arm64
 /HH/*_nrn.py
 /HH/*.hoc
 /HH/*.mod
+*_code.gen.so
+*_eden.py

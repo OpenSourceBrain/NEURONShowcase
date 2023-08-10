@@ -19,7 +19,7 @@
     <Include file="NML2_SingleCompHHCell.nml"/>
 
 
-    <Simulation id="sim1" length="300ms" step="0.01ms" target="net1">
+    <Simulation id="sim1" length="1000ms" step="0.01ms" target="net1">
 
         <Display id="d1" title="Ex5: HH cell with simple morphology: voltage" timeScale="1ms" xmin="0" xmax="300" ymin="-90" ymax="50">
                 <Line id="v" quantity="hhpop[0]/v" scale="1mV" color="#cccccc" timeScale="1ms"/>

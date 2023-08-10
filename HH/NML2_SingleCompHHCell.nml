@@ -78,7 +78,7 @@
 
     </cell>
 
-    <pulseGenerator id="pulseGen1" delay="100ms" duration="100ms" amplitude="0.08nA"/>
+    <pulseGenerator id="pulseGen1" delay="100ms" duration="800ms" amplitude="0.08nA"/>
 
 
     <network id="net1">

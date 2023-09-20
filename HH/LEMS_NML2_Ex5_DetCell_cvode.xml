@@ -8,7 +8,7 @@
          a simulation -->
 
 
-    <Target component="sim1" reportFile="report.ex5.txt"/>
+    <Target component="sim1" reportFile="report.ex5.__SIMULATOR__.__TIMESTAMP__.txt"/>
 
     <Include file="Cells.xml"/>
     <Include file="Networks.xml"/>
@@ -20,6 +20,8 @@
 
 
     <Simulation id="sim1" length="1000ms" step="0.01ms" target="net1">
+
+        <Meta for="neuron" method="cvode" abs_tolerance="0.0001" rel_tolerance="0.001" />
 
         <Display id="d1" title="Ex5: HH cell with simple morphology: voltage" timeScale="1ms" xmin="-100" xmax="1100" ymin="-90" ymax="50">
                 <Line id="v" quantity="hhpop[0]/v" scale="1mV" color="#cccccc" timeScale="1ms"/>
@@ -41,11 +43,11 @@
         </Display>
 
 
-        <OutputFile id="of0" fileName="ex5_v.dat">
+        <OutputFile id="of0" fileName="ex5_v_cvode.dat">
             <OutputColumn id="v" quantity="hhpop[0]/v"/>
         </OutputFile>
 
-        <OutputFile id="of1" fileName="ex5_vars.dat">
+        <OutputFile id="of1" fileName="ex5_vars_cvode.dat">
             <OutputColumn id="m" quantity="hhpop[0]/bioPhys1/membraneProperties/naChans/naChan/m/q"/>
             <OutputColumn id="h" quantity="hhpop[0]/bioPhys1/membraneProperties/naChans/naChan/h/q"/>
             <OutputColumn id="n" quantity="hhpop[0]/bioPhys1/membraneProperties/kChans/kChan/n/q"/>

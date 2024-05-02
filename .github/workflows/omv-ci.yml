@@ -26,6 +26,8 @@ jobs:
             engine: "PyNEURON:7.8.2"
           - python-version: "3.11"
             engine: "PyNEURON:8.0.0"
+          - python-version: "3.11"
+            engine: "PyNEURON:8.1.0"
 
     steps:
     - uses: actions/checkout@v4
@@ -34,6 +36,11 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version:  ${{ matrix.python-version }}
+
+    - name: Install HDF5 for pytables on macos-latest
+      if: ${{ matrix.runs-on == 'macos-latest' }}
+      run: |
+        brew install hdf5
 
     - name: Install OMV
       run: |

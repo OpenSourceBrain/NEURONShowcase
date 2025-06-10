@@ -67,6 +67,6 @@ jobs:
 
     - name: OMV final version info
       run: |
-        omv list -V # list installed engines
+        omv list -V # list installed engines  
         pip list
         env

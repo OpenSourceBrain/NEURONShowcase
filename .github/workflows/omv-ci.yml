@@ -34,10 +34,10 @@ jobs:
             engine: "PyNEURON:8.1.0"
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Set up Python  ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version:  ${{ matrix.python-version }}
 
@@ -47,7 +47,8 @@ jobs:
         brew install hdf5
 
     - name: Install OMV
-      run: |
+      run: |        
+        pip install setuptools==80 # needed for py 3.12
         pip install git+https://github.com/OpenSourceBrain/osb-model-validation
         pip install scipy sympy matplotlib "cython<3.1.0" pandas tables
 
